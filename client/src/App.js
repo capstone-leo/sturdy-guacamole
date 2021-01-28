@@ -27,17 +27,19 @@ const App = () => {
     });
     const circle = new three.LineLoop(geometry, material);
 
-    const planeGeometry = new three.PlaneGeometry(0.5, 20, 32);
+    const planeGeometry = new three.PlaneGeometry(0.5, 10, 6);
     const planeMaterial = new three.MeshBasicMaterial({
       color: 0xffff00,
       side: three.DoubleSide,
     });
     const plane = new three.Mesh(planeGeometry, planeMaterial);
+    plane.position.y = 5;
+
+    circle.add(plane);
 
     //create a scene and add a cube
     const scene = new three.Scene();
     scene.add(circle);
-    scene.add(plane);
     //camera position z:  greater ints zoom out
     camera.position.z = 20;
 
@@ -49,8 +51,6 @@ const App = () => {
       renderer.render(scene, camera);
 
       circle.rotation.z += 0.01;
-
-      plane.rotation.z += 0.01;
     }
     animate();
   }, []);
