@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as three from 'three';
+import * as Tone from 'tone';
 
 const App = () => {
   useEffect(() => {
@@ -10,29 +11,38 @@ const App = () => {
       0.1,
       1000
     );
-    const renderer = new three.WebGLRenderer();
+    const renderer = new three.WebGLRenderer({ alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xa9a9a9, 1);
     //tag it to the document
     document.body.appendChild(renderer.domElement);
 
     //create a cube using pre determined geometry and mesh/skin
-    const geometry = new three.BoxGeometry();
-    const material = new three.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new three.Mesh(geometry, material);
+    const geometry = new three.RingGeometry(10, 10, 32);
+    const material = new three.MeshBasicMaterial({
+      color: 0xffff00,
+      side: three.DoubleSide,
+      wireframe: true,
+      wireframeLinewidth: 2,
+    });
+    const circle = new three.LineLoop(geometry, material);
+
+    console.log(circle);
 
     //create a scene and add a cube
     const scene = new three.Scene();
-    scene.add(cube);
+    scene.add(circle);
     //camera position z:  greater ints zoom out
-    camera.position.z = 3;
+    camera.position.z = 20;
 
+    const chorus = new Tone.Chorus(4, 2.5, 0.5).toDestination().start();
+    // const synth = new Tone.PolySynth().connect(chorus);
     //render the scene
     function animate() {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      //rotate the cube this fast
-      cube.rotation.x += 0.05;
-      cube.rotation.y += 0.01;
+
+      circle.rotation.z += 0.01;
     }
     animate();
   }, []);
