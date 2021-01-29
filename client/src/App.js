@@ -1,6 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import * as three from 'three';
-import * as Tone from 'tone';
+import React, { useState, useEffect } from "react";
+import * as three from "three";
+import * as Tone from "tone";
+import {
+  playC4,
+  playD4,
+  playE4,
+  playF4,
+  playG4,
+  playA4,
+  playB4,
+  playC5,
+  playFilterSynth,
+  playStopOscillator,
+  playDurationOscillator,
+} from "./tone.fn.js";
 
 const App = () => {
   useEffect(() => {
