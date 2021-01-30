@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { BoxHelper } from 'three';
 import * as three from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
+import * as Tone from 'tone'
 import {
   playC4,
   playD4,
@@ -17,87 +19,112 @@ import {
 
 const App = () => {
   useEffect(() => {
+    let intersects;
+    let count = 0
     //instantiate a CAMERA and a RENDERER
-    const camera = new three.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
+    const camera = new three.OrthographicCamera(
+      window.innerWidth / -2,
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      window.innerHeight / -2,
+      1,
       1000
     );
     const renderer = new three.WebGLRenderer({ alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0xa9a9a9, 1);
+    renderer.setClearColor(0x38373d, 1);
     //tag it to the document
     document.body.appendChild(renderer.domElement);
-    console.log(camera);
 
     //SHAPES ----------------------------------------------------------------------
     //create a cube using pre determined geometry and mesh/skin
     const geometry = new three.RingGeometry(10, 10, 32);
-    const material = new three.MeshLambertMaterial({
-      color: 0xffff00,
+    const material = new three.MeshBasicMaterial({
+      color: 0x1be322,
       side: three.DoubleSide,
       wireframe: true,
       wireframeLinewidth: 2,
     });
     const circle = new three.LineLoop(geometry, material);
 
-    const planeGeometry = new three.PlaneGeometry(0.5, 10, 6);
-    const planeMaterial = new three.MeshBasicMaterial({
-      color: 0xffff00,
-      side: three.DoubleSide,
-    });
-    const plane = new three.Mesh(planeGeometry, planeMaterial);
-    plane.position.y = 5;
+    const boxGeometry = new three.BoxGeometry(20, 20, 20);
+    const boxMaterial = new three.MeshBasicMaterial({ wireframe: true, color: 0x1be322, });
+    const boxOne = new three.Mesh(boxGeometry, boxMaterial);
+    boxOne.geometry.computeBoundingBox();
+    const boxOneBoundary = new three.Box3().setFromObject(boxOne);
+    const boxOneHelper = new three.BoxHelper(boxOne, 0xff0000);
+    boxOneHelper.object = boxOne;
+    boxOne.position.setX(-300)
 
-    const sphereGeometry = new three.SphereGeometry(2, 10, 30);
-    const sphereMaterial = new three.MeshLambertMaterial({
-      color: 0xffff00,
+    const boxTwo = new three.Mesh(boxGeometry, boxMaterial);
+    boxOne.geometry.computeBoundingBox();
+    const boxTwoBoundary = new three.Box3().setFromObject(boxOne);
+    const boxTwoHelper = new three.BoxHelper(boxOne, 0xff0000);
+    boxTwoHelper.object = boxTwo;
+    boxTwo.position.setX(-300)
+    boxTwo.position.setY(150)
+    
+    const hammerGeometry = new three.BoxGeometry(0.1, 10, .1);
+    const hammerMaterial = new three.MeshBasicMaterial({
+      color: 0x1be322,
+      side: three.DoubleSide,
+      wireframe: false,
     });
-    const sphere = new three.Mesh(sphereGeometry, sphereMaterial);
-    sphere.position.x = 5;
+    const hammer = new three.Mesh(hammerGeometry, hammerMaterial);
+    hammer.position.y = 5;
+    hammer.geometry.computeBoundingBox();
+    let hammerBox = new three.Box3();
+    hammerBox.setFromObject(hammer);
 
     //create a scene and add a cube
     const scene = new three.Scene();
-    console.log(scene);
+    scene.add(camera);
     scene.add(circle);
-    scene.add(sphere);
-    circle.add(plane);
+    scene.add(boxOne)
+    circle.scale.set(20, 20, 20);
+    circle.add(hammer);
 
     let draggableObjects = [];
-    draggableObjects.push(sphere);
+    draggableObjects.push(boxOne);
 
-    // const group = new three.Group();
-    // scene.add(group);
-
-    //camera position z:  greater ints zoom out
-    camera.position.z = 80;
+    camera.position.z = 30;
 
     //MOUSE EVENTS
-
-    //const raycaster = new three.Raycaster();
-    //const mouse = new three.Vector2();
-
     const controls = new DragControls(
       [...draggableObjects],
       camera,
       renderer.domElement
     );
     controls.addEventListener('drag', render);
-
+let alreadyPlayed = false;
     //render the scene
     function animate() {
-      //MDN window.requestAnimationFrame() -- basically tells browser we're gonna perform an animation 60 times a second
-      //we recursively pass animate so the animation is never ending.
-
       requestAnimationFrame(animate);
+      hammerBox.copy(hammer.geometry.boundingBox).applyMatrix4(hammer.matrixWorld)
+      hammerBox.setFromObject(hammer)
+      circle.rotation.z += 0.05;
+      boxOne.rotation.y += 0.01;
+      boxOne.rotation.x -= 0.01;
+  
+      boxOneBoundary
+      .copy(boxOne.geometry.boundingBox)
+      .applyMatrix4(boxOne.matrixWorld);
 
-      //raycaster basically sends a laser beam from your mouse straight forward through the scene
-      //raycaster.setFromCamera(mouse, camera);
+      if (boxOneBoundary.intersectsBox(hammerBox)) {
+        if (alreadyPlayed === false) {
+          playC4()
+          alreadyPlayed = true
+        }}
 
-      //CIRCLE ROTATION
-      circle.rotation.z += 0.01;
+        if (!boxOneBoundary.intersectsBox(hammerBox)) {
+          alreadyPlayed = false
+        }
+     
+   
+      
 
+      
+      
       render();
     }
 
