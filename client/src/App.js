@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import * as three from 'three';
+import { BoxHelper } from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import {
   playC4,
   playD4,
@@ -32,80 +34,60 @@ const App = () => {
 
     //SHAPES ----------------------------------------------------------------------
     //create a cube using pre determined geometry and mesh/skin
-    const geometry = new three.RingGeometry(10, 10, 32);
-    const material = new three.MeshLambertMaterial({
-      color: 0xffff00,
-      side: three.DoubleSide,
-      wireframe: true,
-      wireframeLinewidth: 2,
-    });
-    const circle = new three.LineLoop(geometry, material);
+    const boxGeometry = new three.BoxGeometry(45, 45, 45);
+    const boxMaterial = new three.MeshBasicMaterial();
+    const boxOne = new three.Mesh(boxGeometry, boxMaterial);
+    const boxTwo = new three.Mesh(boxGeometry, boxMaterial);
 
-    const hammerGeometry = new three.PlaneGeometry(0.5, 10, 1);
-    const hammerMaterial = new three.MeshBasicMaterial({
-      color: 0xffff00,
-      side: three.DoubleSide,
-      wireframe: false,
-    });
-    const hammer = new three.Mesh(hammerGeometry, hammerMaterial);
-    hammer.position.y = 5;
-    hammer.geometry.computeBoundingBox();
-    let hammerBox = new three.Box3();
-    hammerBox.setFromObject(hammer);
-    const hammerHelper = new three.Box3Helper(hammerBox, 0xff0000);
+    boxOne.geometry.computeBoundingBox();
+    boxTwo.geometry.computeBoundingBox();
 
-    const sphereGeometry = new three.SphereGeometry(2, 10, 6);
-    const sphereMaterial = new three.MeshLambertMaterial({
-      color: 0xffff00,
-      wireframe: true,
-    });
-    const sphere = new three.Mesh(sphereGeometry, sphereMaterial);
-    sphere.position.y = -50;
-    sphere.geometry.computeBoundingSphere();
-    const sphereBox = new three.Box3();
-    sphereBox.setFromObject(sphere);
-    const sphereHelper = new three.Box3Helper(sphereBox, 0xff0000);
+    const boxOneBoundary = new three.Box3().setFromObject(boxOne);
+    const boxTwoBoundary = new three.Box3().setFromObject(boxTwo);
 
-    //create a scene and add a cube
+    const boxOneHelper = new three.BoxHelper(boxOne, 0xff0000);
+
+    const boxTwoHelper = new three.BoxHelper(boxTwo, 0xff0000);
+
+    //SCENE
     const scene = new three.Scene();
     scene.add(camera);
-    scene.add(circle);
-
-    circle.scale.set(50, 50, 50);
-    sphere.scale.set(50, 50, 50);
-    scene.add(sphere);
-    scene.add(sphereHelper);
-    // console.log(sphereHelper);
-
-    circle.add(hammer);
-    circle.add(hammerHelper);
+    scene.add(boxOne);
+    scene.add(boxTwo);
+    scene.add(boxOneHelper);
+    scene.add(boxTwoHelper);
 
     let draggableObjects = [];
-    draggableObjects.push(sphere);
+    draggableObjects.push(boxOne);
+    draggableObjects.push(boxTwo);
 
     camera.position.z = 30;
 
     //MOUSE EVENTS
-    const controls = new DragControls(
+    const dragControls = new DragControls(
       [...draggableObjects],
       camera,
       renderer.domElement
     );
-    controls.addEventListener('drag', render);
+    dragControls.addEventListener('drag', render);
 
     //render the scene
     function animate() {
       requestAnimationFrame(animate);
+      boxOneBoundary
+        .copy(boxOne.geometry.boundingBox)
+        .applyMatrix4(boxOne.matrixWorld);
+      boxTwoBoundary
+        .copy(boxTwo.geometry.boundingBox)
+        .applyMatrix4(boxTwo.matrixWorld);
 
-      //CIRCLE ROTATION
-
-      circle.rotation.z += 0.01;
-      sphere.rotation.y += 0.01;
-      sphere.rotation.x -= 0.01;
-
-      if (sphereBox.intersectsBox(hammerBox)) {
+      boxOneHelper.update(boxOneBoundary);
+      boxTwoHelper.update(boxTwoBoundary);
+      if (boxOneBoundary.intersectsBox(boxTwoBoundary)) {
         console.log('hello');
       }
+
+      //CIRCLE ROTATION
       render();
     }
 
