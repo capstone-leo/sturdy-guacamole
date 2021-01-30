@@ -19,6 +19,7 @@ import {
 
 const App = () => {
   useEffect(() => {
+    let intersects;
     //instantiate a CAMERA and a RENDERER
     const camera = new three.OrthographicCamera(
       window.innerWidth / -2,
@@ -34,20 +35,24 @@ const App = () => {
 
     //SHAPES ----------------------------------------------------------------------
     //create a cube using pre determined geometry and mesh/skin
-    const boxGeometry = new three.BoxGeometry(45, 45, 45);
-    const boxMaterial = new three.MeshBasicMaterial();
+    const boxGeometry = new three.BoxGeometry(45, 90, 45);
+    const boxMaterial = new three.MeshBasicMaterial({ wireframe: true });
     const boxOne = new three.Mesh(boxGeometry, boxMaterial);
     const boxTwo = new three.Mesh(boxGeometry, boxMaterial);
 
     boxOne.geometry.computeBoundingBox();
     boxTwo.geometry.computeBoundingBox();
 
+    //Boundaries
     const boxOneBoundary = new three.Box3().setFromObject(boxOne);
     const boxTwoBoundary = new three.Box3().setFromObject(boxTwo);
 
+    //Boundary Helpers
     const boxOneHelper = new three.BoxHelper(boxOne, 0xff0000);
-
     const boxTwoHelper = new three.BoxHelper(boxTwo, 0xff0000);
+
+    boxOneHelper.object = boxOne;
+    boxTwoHelper.object = boxTwo;
 
     //SCENE
     const scene = new three.Scene();
@@ -74,6 +79,9 @@ const App = () => {
     //render the scene
     function animate() {
       requestAnimationFrame(animate);
+
+      boxOne.rotation.z += 0.01;
+
       boxOneBoundary
         .copy(boxOne.geometry.boundingBox)
         .applyMatrix4(boxOne.matrixWorld);
@@ -81,10 +89,16 @@ const App = () => {
         .copy(boxTwo.geometry.boundingBox)
         .applyMatrix4(boxTwo.matrixWorld);
 
-      boxOneHelper.update(boxOneBoundary);
-      boxTwoHelper.update(boxTwoBoundary);
+      boxOneHelper.setFromObject(boxOne);
+      boxTwoHelper.setFromObject(boxTwo);
+
       if (boxOneBoundary.intersectsBox(boxTwoBoundary)) {
-        console.log('hello');
+        if (intersects === false) {
+          playC4();
+          intersects = true;
+        }
+      } else {
+        intersects = false;
       }
 
       //CIRCLE ROTATION
