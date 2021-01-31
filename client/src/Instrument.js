@@ -57,7 +57,14 @@ class Instrument {
       wireframeLinewidth: 2,
     });
     this.mesh = new three.Mesh(this.geometry, this.material);
-    this.mesh.position.setX(-300);
+    //sets random X & Y coordinates where -300 >= X >= 300 & -150 >= Y >= 150 (basically it wont be in the circle)
+    this.mesh.position.setX(
+      Math.floor(Math.random() * 300 + 300) * (Math.random() < 0.5 ? -1 : 1)
+    );
+    this.mesh.position.setY(
+      Math.floor(Math.random() * 150 + 150) * (Math.random() < 0.5 ? -1 : 1)
+    );
+
     this.boundary = new three.Box3().setFromObject(this.mesh);
     this.boundaryHelper = new three.BoxHelper(this.mesh, 0xff0000);
     this.boundaryHelper.object = this.mesh;
@@ -65,8 +72,7 @@ class Instrument {
     this.alreadyPlayed = false;
   }
   playSound = () => {
-    const sound = this.sound;
-    sound();
+    this.sound();
   };
 }
 

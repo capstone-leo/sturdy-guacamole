@@ -3,7 +3,7 @@ import { BoxHelper } from 'three';
 import * as three from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as Tone from 'tone';
-import Instrument from './3d-instrument';
+import Instrument from './Instrument';
 import {
   playC4,
   playD4,
@@ -26,10 +26,12 @@ import {
   sinF4,
   sinG4,
 } from './tone.fn.js';
+import { generateBoxes } from './dryloops.js';
 
 const App = () => {
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
+    //Orthographic camera projects 3D space as a 2D image
     const camera = new three.OrthographicCamera(
       window.innerWidth / -2,
       window.innerWidth / 2,
@@ -42,15 +44,20 @@ const App = () => {
     const renderer = new three.WebGLRenderer({ alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x38373d, 1);
-    //tag it to the document
     document.body.appendChild(renderer.domElement);
 
     //soundstuffs
+    // const chords = [
+    //   'A0 C1 E1',
+    //   'F0 A0 C1',
+    //   'G0 B0 D1',
+    //   'D0 F0 A0',
+    //   'E0 G0 B0',
+    // ].map(formatChords);
 
     // Tone.Transport.scheduleRepeat(onRepeat, '16n');
     // Tone.Transport.start();
     // Tone.Transport.bpm.value = 90;
-
     // const synth = new Tone.Synth();
     // const gain = new Tone.Gain(0.7);
     // synth.oscillator.type = 'sine';
@@ -74,6 +81,7 @@ const App = () => {
       side: three.DoubleSide,
       wireframe: false,
     });
+
     const hammer = new three.Mesh(hammerGeometry, hammerMaterial);
     hammer.position.y = 5;
     hammer.geometry.computeBoundingBox();
@@ -81,11 +89,12 @@ const App = () => {
     hammerBox.setFromObject(hammer);
 
     //INSTRUMENTS
-
-    const instrument = new Instrument();
+    //generates a randomized set of instruments (in this case, 6)
+    //includes random coordinates outside of jamSpace, and random sound
     const instruments = [];
-    instruments.push(instrument);
-    console.log(instruments);
+    for (let i = 0; i <= 6; i++) {
+      instruments.push(new Instrument());
+    }
 
     //SCENE
     const scene = new three.Scene();
@@ -93,6 +102,7 @@ const App = () => {
     scene.add(jamSpace);
     jamSpace.add(hammer);
 
+    //adds each instrument to the scene as a draggable object
     let draggableObjects = [];
     instruments.forEach((instrument) => {
       scene.add(instrument.mesh);
@@ -100,38 +110,48 @@ const App = () => {
     });
 
     //MOUSE EVENTS
+    //makes objects draggable
     const controls = new DragControls(
       [...draggableObjects],
       camera,
       renderer.domElement
     );
     controls.addEventListener('drag', render);
+
     //render the scene
     function animate() {
+      //requests a render for every frame (60/fps)
       requestAnimationFrame(animate);
+
+      //sets the collision trigger for the hammer
       hammerBox
         .copy(hammer.geometry.boundingBox)
         .applyMatrix4(hammer.matrixWorld);
-
       hammerBox.setFromObject(hammer);
       jamSpace.rotation.z += 0.05;
 
+      //NEEDS OPTIMIZING ---
       instruments.forEach((instrument) => {
+        //every instrument is rotated
         instrument.mesh.rotation.y += 0.01;
         instrument.mesh.rotation.x -= 0.01;
+
+        //every instruments' collision trigger is set
         instrument.boundary
           .copy(instrument.mesh.geometry.boundingBox)
           .applyMatrix4(instrument.mesh.matrixWorld);
+
+        //if the hammer strikes the instrument, play note
+        if (instrument.boundary.intersectsBox(hammerBox)) {
+          if (instrument.alreadyPlayed === false) {
+            instrument.playSound();
+            instrument.alreadyPlayed = true;
+          }
+        } else {
+          instrument.alreadyPlayed = false;
+        }
       });
 
-      if (instrument.boundary.intersectsBox(hammerBox)) {
-        if (instrument.alreadyPlayed === false) {
-          instrument.playSound();
-          instrument.alreadyPlayed = true;
-        }
-      } else {
-        instrument.alreadyPlayed = false;
-      }
       render();
     }
     function render() {
