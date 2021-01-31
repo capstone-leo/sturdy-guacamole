@@ -151,7 +151,7 @@ const App = () => {
           instrument.alreadyPlayed = false;
         }
       });
-
+      console.log(scene);
       render();
     }
     function render() {
