@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { BoxHelper } from 'three';
 import * as three from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as Tone from 'tone';
@@ -103,6 +102,7 @@ const App = () => {
     jamSpace.add(hammer);
 
     //adds each instrument to the scene as a draggable object
+    //notice, the instruments mesh is added
     let draggableObjects = [];
     instruments.forEach((instrument) => {
       scene.add(instrument.mesh);
@@ -110,7 +110,7 @@ const App = () => {
     });
 
     //MOUSE EVENTS
-    //makes objects draggable
+    //makes objects(instruments) draggable
     const controls = new DragControls(
       [...draggableObjects],
       camera,
