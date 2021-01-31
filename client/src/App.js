@@ -3,19 +3,8 @@ import { BoxHelper } from 'three';
 import * as three from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as Tone from 'tone';
-import {
-  playC4,
-  playD4,
-  playE4,
-  playF4,
-  playG4,
-  playA4,
-  playB4,
-  playC5,
-  playFilterSynth,
-  playStopOscillator,
-  playDurationOscillator,
-} from './tone.fn.js';
+import { playC4, playD4, playE4, playF4, playG4, playA4, playB4, playC5, playFilterSynth, playStopOscillator, playDurationOscillator,
+formatChords, onRepeat, sinB4, sinA4, sinC4, sinD4, sinE4, sinF4, sinG4} from './tone.fn.js';
 
 const App = () => {
   useEffect(() => {
@@ -34,6 +23,29 @@ const App = () => {
     //tag it to the document
     document.body.appendChild(renderer.domElement);
 
+    //soundstuffs
+
+    const $inputs = document.querySelectorAll('input'),
+
+    chords = [
+      'A0 C1 E1', 'F0 A0 C1', 'G0 B0 D1',
+      'D0 F0 A0', 'E0 G0 B0'].map(formatChords)
+      var chordIdx = 0,
+      step = 0;
+
+      // function handleChord(valueString) {
+      //   chordIdx = parseInt(valueString) - 1;
+      // }
+
+      Tone.Transport.scheduleRepeat(onRepeat, '16n');
+      Tone.Transport.start();
+      Tone.Transport.bpm.value = 90;
+
+      const synth = new Tone.Synth();
+      const gain = new Tone.Gain(0.7);
+      synth.oscillator.type = 'sine';
+      gain.toDestination();
+      synth.connect(gain);
     //SHAPES ----------------------------------------------------------------------
     //create a cube using pre determined geometry and mesh/skin
     const geometry = new three.RingGeometry(10, 10, 32);
@@ -48,7 +60,7 @@ const App = () => {
     const boxGeometry = new three.BoxGeometry(20, 20, 20);
     const boxMaterial = new three.MeshBasicMaterial({
       wireframe: true,
-      color: 0x1be322,
+      color: 0xff7700,
     });
     const boxOne = new three.Mesh(boxGeometry, boxMaterial);
     boxOne.geometry.computeBoundingBox();
@@ -201,42 +213,46 @@ const App = () => {
 
           if (boxOneBoundary.intersectsBox(hammerBox)) {
         if (alreadyPlayed === false) {
-          playC4();
-          alreadyPlayed = true;
+          sinA4()
+          alreadyPlayed = true
         }
-      }
+          }
 
       if (!boxOneBoundary.intersectsBox(hammerBox)) {
-        alreadyPlayed = false;
+      alreadyPlayed = false
       }
-      
+
       if (boxTwoBoundary.intersectsBox(hammerBox)) {
-        if (alreadyPlayed2 === false) {
-          playE4();
-          alreadyPlayed2 = true;
-        }
+          // handleChord(5)
+          if (alreadyPlayed2 === false) {
+            sinB4()
+            alreadyPlayed2 = true
       }
+    }
 
       if (!boxTwoBoundary.intersectsBox(hammerBox)) {
         alreadyPlayed2 = false;
       }
 
       if (boxThreeBoundary.intersectsBox(hammerBox)) {
-        if (alreadyPlayed3 === false) {
-          playF4();
-          alreadyPlayed3 = true;
-        }
+      chordIdx = 3
+      if (alreadyPlayed3 === false){
+      Tone.start()
+      Tone.Transport.start()
+      alreadyPlayed3 = true
+      }
       }
 
       if (!boxThreeBoundary.intersectsBox(hammerBox)) {
-        alreadyPlayed3 = false;
+        alreadyPlayed3 = false
+      Tone.Transport.stop()
       }
 
     
 
       if (boxFourBoundary.intersectsBox(hammerBox)) {
         if (alreadyPlayed4 === false) {
-          playB4();
+          sinC4();
           alreadyPlayed4 = true;
         }
       }
@@ -247,7 +263,7 @@ const App = () => {
 
       if (boxFiveBoundary.intersectsBox(hammerBox)) {
         if (alreadyPlayed5 === false) {
-          playA4();
+          sinD4();
           alreadyPlayed5 = true;
         }
       }
@@ -258,7 +274,7 @@ const App = () => {
 
       if (boxSixBoundary.intersectsBox(hammerBox)) {
         if (alreadyPlayed6 === false) {
-          playD4();
+          sinE4();
           alreadyPlayed6 = true;
         }
       }
@@ -271,7 +287,7 @@ const App = () => {
 
       render();
     }
-
+console.log(chords)
     function render() {
       //RENDER
       renderer.render(scene, camera);
