@@ -223,7 +223,6 @@ const App = () => {
       }
 
       if (boxTwoBoundary.intersectsBox(hammerBox)) {
-          // handleChord(5)
           if (alreadyPlayed2 === false) {
             sinB4()
             alreadyPlayed2 = true
@@ -235,7 +234,6 @@ const App = () => {
       }
 
       if (boxThreeBoundary.intersectsBox(hammerBox)) {
-      chordIdx = 3
       if (alreadyPlayed3 === false){
       Tone.start()
       Tone.Transport.start()
