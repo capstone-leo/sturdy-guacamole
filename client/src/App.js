@@ -129,7 +129,7 @@ const App = () => {
     let drag = false;
     function onMouseMove(event) {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
+      mouse.y = (event.clientY / window.innerHeight) * -2 + 1;
     }
 
     let controls = new DragControls(
@@ -159,19 +159,19 @@ const App = () => {
 
     window.addEventListener('click', addInstrument, false);
     window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('resize', onWindowResize);
+    //window.addEventListener('resize', onWindowResize);
 
     //render the scene
     function animate() {
       //requests a render for every frame (60/fps)
       requestAnimationFrame(animate);
 
-      //raycaster set up
+      //raycaster set up from mouse position * pov of camera
       raycaster.setFromCamera(mouse, camera);
-
       const intersects = raycaster.intersectObjects(scene.children);
-
-      for (let i = 0; i < intersects.length; i++) {}
+      for (let i = 0; i < intersects.length; i++) {
+        console.log(intersects);
+      }
 
       //sets the collision trigger for the hammer
       hammerBox
