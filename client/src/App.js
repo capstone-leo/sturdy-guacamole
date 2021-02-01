@@ -45,6 +45,19 @@ const App = () => {
     renderer.setClearColor(0x38373d, 1);
     document.body.appendChild(renderer.domElement);
 
+    function onWindowResize() {
+      const aspect = window.innerWidth / window.innerHeight;
+
+      camera.left = (window.innerWidth * aspect) / -2;
+      camera.right = (window.innerWidth * aspect) / 2;
+      camera.top = window.innerWidth / 2;
+      camera.bottom = window.innerWidth / -2;
+
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
     //soundstuffs
     // const chords = [
     //   'A0 C1 E1',
@@ -126,6 +139,7 @@ const App = () => {
     controls.addEventListener('drag', render);
 
     window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('resize', onWindowResize);
 
     //render the scene
     function animate() {
