@@ -1,4 +1,5 @@
 import * as three from 'three';
+import * as tone from 'tone'
 import {
   playC4,
   playD4,
@@ -15,6 +16,7 @@ import {
   sinE4,
   sinF4,
   sinG4,
+  transpo,
 } from './tone.fn.js';
 
 const soundList = [
@@ -26,6 +28,7 @@ const soundList = [
   playA4,
   playB4,
   playC5,
+// transpo,
   sinB4,
   sinA4,
   sinC4,
@@ -103,13 +106,19 @@ class Instrument {
     this.mesh.position.setY(
       Math.floor(Math.random() * 150 + 150) * (Math.random() < 0.5 ? -1 : 1)
     );
+    
 
     this.boundary = new three.Box3().setFromObject(this.mesh);
     this.boundaryHelper = new three.BoxHelper(this.mesh, 0xff0000);
     this.boundaryHelper.object = this.mesh;
     this.sound = soundList[Math.floor(Math.random() * soundList.length)];
     this.alreadyPlayed = false;
+    this.transportStarted = false;
+ 
   }
+  transportStart = () => { tone.Transport.start();
+  console.log('ok') }
+  transportStop = () => { tone.Transport.stop() }
   playSound = () => {
     this.sound();
   };

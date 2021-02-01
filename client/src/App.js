@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as three from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as Tone from 'tone';
 import Instrument from './Instrument';
+import { Slider } from './Slider'
+
 import {
   playC4,
   playD4,
@@ -28,6 +30,7 @@ import {
 import { generateBoxes } from './dryloops.js';
 
 const App = () => {
+
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
     //Orthographic camera projects 3D space as a 2D image
@@ -44,6 +47,19 @@ const App = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x38373d, 1);
     document.body.appendChild(renderer.domElement);
+
+    function onWindowResize() {
+      const aspect = window.innerWidth / window.innerHeight;
+
+      camera.left = (window.innerWidth * aspect) / -2;
+      camera.right = (window.innerWidth * aspect) / 2;
+      camera.top = window.innerWidth / 2;
+      camera.bottom = window.innerWidth / -2;
+
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
 
     //soundstuffs
     // const chords = [
@@ -62,6 +78,7 @@ const App = () => {
     // synth.oscillator.type = 'sine';
     // gain.toDestination();
     // synth.connect(gain);
+  
 
     //JAMSPACE & HAMMER ----------------------------------------------------------------------
     const jamSpaceGeometry = new three.RingGeometry(10, 10, 32);
@@ -111,25 +128,75 @@ const App = () => {
 
     //MOUSE EVENTS
     //makes objects(instruments) draggable
-    const controls = new DragControls(
+    const mouse = new three.Vector2();
+    const raycaster = new three.Raycaster();
+    let drag = false;
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
+    }
+
+    let controls = new DragControls(
       [...draggableObjects],
       camera,
       renderer.domElement
     );
-    controls.addEventListener('drag', render);
+
+    controls.addEventListener('drag', onDrag);
+    function onDrag() {
+      drag = true;
+      render();
+    }
+    let sliderValue = 0.05
+    let slider = document.getElementById("slider");
+    slider.addEventListener('input', onInput) 
+    function onInput() {
+      sliderValue = Number(slider.value)
+    }
+
+
+    function addInstrument() {
+      if (drag === false) {
+        const newInstrument = new Instrument();
+        instruments.push(newInstrument);
+        scene.add(newInstrument.mesh);
+        draggableObjects.push(newInstrument.mesh);
+        controls = new DragControls(
+          [...draggableObjects],
+          camera,
+          renderer.domElement
+        );
+      }
+      drag = false;
+    }
+
+    window.addEventListener('dblclick', addInstrument, false);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('resize', onWindowResize);
 
     //render the scene
     function animate() {
       //requests a render for every frame (60/fps)
       requestAnimationFrame(animate);
 
+      //raycaster set up
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(scene.children);
+
+      for (let i = 0; i < intersects.length; i++) {}
+
       //sets the collision trigger for the hammer
       hammerBox
         .copy(hammer.geometry.boundingBox)
         .applyMatrix4(hammer.matrixWorld);
       hammerBox.setFromObject(hammer);
-      jamSpace.rotation.z += 0.05;
 
+  
+// console.log(sliderValue)
+       jamSpace.rotation.z += sliderValue
+
+      // console.log(jamRotate)
       //NEEDS OPTIMIZING ---
       instruments.forEach((instrument) => {
         //every instrument is rotated
@@ -151,7 +218,7 @@ const App = () => {
           instrument.alreadyPlayed = false;
         }
       });
-      console.log(scene);
+     
       render();
     }
     function render() {
@@ -159,8 +226,11 @@ const App = () => {
       renderer.render(scene, camera);
     }
     animate();
+  
+   
   }, []);
-  return <div className="App"></div>;
+  return <div className="App"><Slider id="slider" /></div>
+    
 };
 
 export default App;
