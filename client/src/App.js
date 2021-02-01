@@ -31,11 +31,13 @@ const App = () => {
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
     //Orthographic camera projects 3D space as a 2D image
+    const size = 1000;
+    const aspect = window.innerWidth / window.innerHeight;
     const camera = new three.OrthographicCamera(
-      window.innerWidth / -2,
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      window.innerHeight / -2,
+      (size * aspect) / -2,
+      (size * aspect) / 2,
+      size / 2,
+      size / -2,
       -1000,
       1000
     );
@@ -46,12 +48,12 @@ const App = () => {
     document.body.appendChild(renderer.domElement);
 
     function onWindowResize() {
-      const aspect = window.innerWidth / window.innerHeight;
+      const newAspect = window.innerWidth / window.innerHeight;
 
-      camera.left = (window.innerWidth * aspect) / -2;
-      camera.right = (window.innerWidth * aspect) / 2;
-      camera.top = window.innerWidth / 2;
-      camera.bottom = window.innerWidth / -2;
+      camera.left = (size * newAspect) / -2;
+      camera.right = (size * newAspect) / 2;
+      camera.top = size / 2;
+      camera.bottom = size / -2;
 
       camera.updateProjectionMatrix();
 
@@ -159,7 +161,7 @@ const App = () => {
 
     window.addEventListener('click', addInstrument, false);
     window.addEventListener('mousemove', onMouseMove);
-    //window.addEventListener('resize', onWindowResize);
+    window.addEventListener('resize', onWindowResize);
 
     //render the scene
     function animate() {
