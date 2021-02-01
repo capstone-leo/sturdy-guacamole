@@ -111,6 +111,13 @@ const App = () => {
 
     //MOUSE EVENTS
     //makes objects(instruments) draggable
+    const mouse = new three.Vector2();
+    const raycaster = new three.Raycaster();
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
+    }
+
     const controls = new DragControls(
       [...draggableObjects],
       camera,
@@ -118,10 +125,19 @@ const App = () => {
     );
     controls.addEventListener('drag', render);
 
+    window.addEventListener('mousemove', onMouseMove);
+
     //render the scene
     function animate() {
       //requests a render for every frame (60/fps)
       requestAnimationFrame(animate);
+
+      //raycaster set up
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(scene.children);
+
+      for (let i = 0; i < intersects.length; i++) {}
 
       //sets the collision trigger for the hammer
       hammerBox
@@ -151,7 +167,6 @@ const App = () => {
           instrument.alreadyPlayed = false;
         }
       });
-      console.log(scene);
       render();
     }
     function render() {
