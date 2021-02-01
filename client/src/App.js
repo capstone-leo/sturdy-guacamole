@@ -126,18 +126,38 @@ const App = () => {
     //makes objects(instruments) draggable
     const mouse = new three.Vector2();
     const raycaster = new three.Raycaster();
+    let drag = false;
     function onMouseMove(event) {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
     }
 
-    const controls = new DragControls(
+    let controls = new DragControls(
       [...draggableObjects],
       camera,
       renderer.domElement
     );
-    controls.addEventListener('drag', render);
+    controls.addEventListener('drag', onDrag);
+    function onDrag() {
+      drag = true;
+      render();
+    }
+    function addInstrument() {
+      if (drag === false) {
+        const newInstrument = new Instrument();
+        instruments.push(newInstrument);
+        scene.add(newInstrument.mesh);
+        draggableObjects.push(newInstrument.mesh);
+        controls = new DragControls(
+          [...draggableObjects],
+          camera,
+          renderer.domElement
+        );
+      }
+      drag = false;
+    }
 
+    window.addEventListener('click', addInstrument, false);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onWindowResize);
 
