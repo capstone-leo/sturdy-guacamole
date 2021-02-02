@@ -52,19 +52,6 @@ const App = () => {
     renderer.setClearColor(0x38373d, 1);
     document.body.appendChild(renderer.domElement);
 
-    function onWindowResize() {
-      const newAspect = window.innerWidth / window.innerHeight;
-
-      camera.left = (size * newAspect) / -2;
-      camera.right = (size * newAspect) / 2;
-      camera.top = size / 2;
-      camera.bottom = size / -2;
-
-      camera.updateProjectionMatrix();
-
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
     //soundstuffs
     // const chords = [
     //   'A0 C1 E1',
@@ -170,6 +157,19 @@ const App = () => {
         );
       }
       drag = false;
+    }
+
+    function onWindowResize() {
+      const newAspect = window.innerWidth / window.innerHeight;
+
+      camera.left = (size * newAspect) / -2;
+      camera.right = (size * newAspect) / 2;
+      camera.top = size / 2;
+      camera.bottom = size / -2;
+
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     window.addEventListener('dblclick', addInstrument, false);
