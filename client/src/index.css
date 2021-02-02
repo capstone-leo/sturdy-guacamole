@@ -27,9 +27,18 @@ code {
   position: absolute;
   right:30px;
   top:30px;
+  color: gray;
+  background: pink;
+}
+#slider:hover {
+  cursor: grab; 
+
 }
 .slider {
   position: absolute;
   right: 30px;
   top: 30px;
+  display: flex;
+  flex-direction: row;
+
 }

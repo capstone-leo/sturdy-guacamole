@@ -235,13 +235,15 @@ const App = () => {
   
     <Slider id="slider" />
     <button className="about" style={{color: 'whitesmoke', position: 'relative', background: '#38373d', border: 'transparent' }}onClick={()=>setModalOpen(!modalOpen)}>about</button>
-    <Modal isOpen={modalOpen}>
+    <Modal isOpen={modalOpen}>    
       <div>
-        double click these shapes to adjust their sounds
-        single click to play a sound
-        jam with your friends or play by yourself 
+        double click these shapes to adjust their sounds<br/>
+        single click to play a sound<br/>
+        jam with your friends or play by yourself <br/>
         PLACEHOLDERS
-        <button className="about" style={{cursor: 'grab'}} onClick={()=>setModalOpen(!modalOpen)}>close</button></div></Modal>
+      </div>
+      <button className="closer" style={{cursor: 'grab'}} onClick={()=>setModalOpen(!modalOpen)}>close</button>
+    </Modal>
     </div>
     
 };
