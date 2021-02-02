@@ -1,6 +1,10 @@
 //functions for/selection of tones
 import * as Tone from "tone";
 
+export  function transpo() {
+  // e.preventDefault()
+  Tone.Transport.start()
+}
 export function playC4() {
   const synth = new Tone.Synth().toDestination();
   synth.triggerAttackRelease("C4", "4n");
@@ -107,6 +111,7 @@ synth.connect(gain);
     let chord = chords[chordIdx],
         note = chord[step % chord.length];
     synth.triggerAttackRelease(note, '16n', time);
+    console.log("step", step%chord.length)
     step++;
   }
 export function sinB4() {

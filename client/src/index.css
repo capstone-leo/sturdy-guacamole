@@ -11,3 +11,69 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.about {
+  background-color: pink;
+  position: absolute;
+  left: 30px;
+  top: 30px;
+
+  }
+
+.about:hover {
+  cursor: pointer
+}
+#slider {
+  position: absolute;
+  right:30px;
+  top:30px;
+  color: gray;
+  background: pink;
+}
+#slider:hover {
+  cursor: grab; 
+
+}
+.slider {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}
+
+.tempoText {
+  font-size: 12px;
+  position: relative;
+  top: 15px;
+  right: 45px;
+}
+
+.sliderchild {
+  font-size: 12px;
+  position: relative;
+top: 10px;
+}
+
+.Modal {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  right: 50%;
+  bottom: 40px;
+  opacity: 80%;
+  background: whitesmoke;
+}
+
+.closer {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+
+.closer:hover {
+  cursor: pointer;
+}
+
+.modalTextDiv {
+  padding: 30px;
+  background-color: whitesmoke
+}
