@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import * as three from 'three';
+import * as THREE from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as Tone from 'tone';
 import Instrument from './Instrument';
 import { Slider } from './Slider'
 import Modal from 'react-modal';
+
 
 import {
   playC4,
@@ -36,7 +37,7 @@ const App = () => {
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
     //Orthographic camera projects 3D space as a 2D image
-    const camera = new three.OrthographicCamera(
+    const camera = new THREE.OrthographicCamera(
       window.innerWidth / -2,
       window.innerWidth / 2,
       window.innerHeight / 2,
@@ -45,7 +46,7 @@ const App = () => {
       1000
     );
     camera.position.z = 30;
-    const renderer = new three.WebGLRenderer({ alpha: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x38373d, 1);
     document.body.appendChild(renderer.domElement);
@@ -83,27 +84,27 @@ const App = () => {
   
 
     //JAMSPACE & HAMMER ----------------------------------------------------------------------
-    const jamSpaceGeometry = new three.RingGeometry(10, 10, 32);
-    const jamSpaceMaterial = new three.MeshBasicMaterial({
+    const jamSpaceGeometry = new THREE.RingGeometry(10, 10, 32);
+    const jamSpaceMaterial = new THREE.MeshBasicMaterial({
       color: 0x1be322,
-      side: three.DoubleSide,
+      side: THREE.DoubleSide,
       wireframe: true,
       wireframeLinewidth: 2,
     });
-    const jamSpace = new three.LineLoop(jamSpaceGeometry, jamSpaceMaterial);
+    const jamSpace = new THREE.LineLoop(jamSpaceGeometry, jamSpaceMaterial);
     jamSpace.scale.set(20, 20, 20);
 
-    const hammerGeometry = new three.BoxGeometry(0.1, 10, 0.1);
-    const hammerMaterial = new three.MeshBasicMaterial({
+    const hammerGeometry = new THREE.BoxGeometry(0.1, 10, 0.1);
+    const hammerMaterial = new THREE.MeshBasicMaterial({
       color: 0x1be322,
-      side: three.DoubleSide,
+      side: THREE.DoubleSide,
       wireframe: false,
     });
 
-    const hammer = new three.Mesh(hammerGeometry, hammerMaterial);
+    const hammer = new THREE.Mesh(hammerGeometry, hammerMaterial);
     hammer.position.y = 5;
     hammer.geometry.computeBoundingBox();
-    let hammerBox = new three.Box3();
+    let hammerBox = new THREE.Box3();
     hammerBox.setFromObject(hammer);
 
     //INSTRUMENTS
@@ -115,7 +116,7 @@ const App = () => {
     }
 
     //SCENE
-    const scene = new three.Scene();
+    const scene = new THREE.Scene();
     scene.add(camera);
     scene.add(jamSpace);
     jamSpace.add(hammer);
@@ -130,8 +131,8 @@ const App = () => {
 
     //MOUSE EVENTS
     //makes objects(instruments) draggable
-    const mouse = new three.Vector2();
-    const raycaster = new three.Raycaster();
+    const mouse = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
     let drag = false;
     function onMouseMove(event) {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -177,7 +178,8 @@ const App = () => {
     window.addEventListener('dblclick', addInstrument, false);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onWindowResize);
-
+    
+  
     //render the scene
     function animate() {
       //requests a render for every frame (60/fps)
@@ -198,11 +200,7 @@ const App = () => {
         .applyMatrix4(hammer.matrixWorld);
       hammerBox.setFromObject(hammer);
 
-  
-// console.log(sliderValue)
-       jamSpace.rotation.z += sliderValue
-
-      // console.log(jamRotate)
+      jamSpace.rotation.z += sliderValue
       //NEEDS OPTIMIZING ---
       instruments.forEach((instrument) => {
         //every instrument is rotated
@@ -224,6 +222,7 @@ const App = () => {
           instrument.alreadyPlayed = false;
         }
       });
+      
      
       render();
     }
