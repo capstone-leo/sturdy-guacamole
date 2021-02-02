@@ -138,6 +138,8 @@ const App = () => {
       mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
     }
 
+
+
     let controls = new DragControls(
       [...draggableObjects],
       camera,
@@ -156,7 +158,7 @@ const App = () => {
       sliderValue = Number(slider.value)
     }
 
-
+    
     function addInstrument() {
       if (drag === false) {
         const newInstrument = new Instrument();
@@ -186,7 +188,9 @@ const App = () => {
 
       const intersects = raycaster.intersectObjects(scene.children);
 
-      for (let i = 0; i < intersects.length; i++) {}
+      for (let i = 0; i < intersects.length; i++) {
+       console.log(intersects)
+      }
 
       //sets the collision trigger for the hammer
       hammerBox
@@ -232,17 +236,17 @@ const App = () => {
    
   }, []);
   return <div className="App" style={{background: "#38373d", color: 'whitesmoke'}}  >
-  
-    <Slider id="slider" />
-    <button className="about" style={{color: 'whitesmoke', position: 'relative', background: '#38373d', border: 'transparent' }}onClick={()=>setModalOpen(!modalOpen)}>about</button>
-    <Modal isOpen={modalOpen}>    
-      <div>
+    
+  <Slider id="slider" />
+    <button className="about" style={{color: 'whitesmoke', position: 'relative', background: 'transparent', border: 'transparent' }}onClick={()=>setModalOpen(!modalOpen)}>about</button>
+    <Modal className="Modal" isOpen={modalOpen}>    
+      <div className="modalTextDiv">
         double click these shapes to adjust their sounds<br/>
         single click to play a sound<br/>
         jam with your friends or play by yourself <br/>
         PLACEHOLDERS
       </div>
-      <button className="closer" style={{cursor: 'grab'}} onClick={()=>setModalOpen(!modalOpen)}>close</button>
+      <button className="closer" onClick={()=>setModalOpen(!modalOpen)}>close</button>
     </Modal>
     </div>
     
