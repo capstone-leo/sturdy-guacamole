@@ -3,9 +3,8 @@ import * as THREE from 'three';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as Tone from 'tone';
 import Instrument from './Instrument';
-import { Slider } from './Slider'
+import { Slider } from './Slider';
 import Modal from 'react-modal';
-
 
 import {
   playC4,
@@ -32,16 +31,18 @@ import {
 import { generateBoxes } from './dryloops.js';
 
 const App = () => {
-  const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
     //Orthographic camera projects 3D space as a 2D image
+    const size = 1000;
+    const aspect = window.innerWidth / window.innerHeight;
     const camera = new THREE.OrthographicCamera(
-      window.innerWidth / -2,
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      window.innerHeight / -2,
+      (size * aspect) / -2,
+      (size * aspect) / 2,
+      size / 2,
+      size / -2,
       -1000,
       1000
     );
@@ -52,12 +53,12 @@ const App = () => {
     document.body.appendChild(renderer.domElement);
 
     function onWindowResize() {
-      const aspect = window.innerWidth / window.innerHeight;
+      const newAspect = window.innerWidth / window.innerHeight;
 
-      camera.left = (window.innerWidth * aspect) / -2;
-      camera.right = (window.innerWidth * aspect) / 2;
-      camera.top = window.innerWidth / 2;
-      camera.bottom = window.innerWidth / -2;
+      camera.left = (size * newAspect) / -2;
+      camera.right = (size * newAspect) / 2;
+      camera.top = size / 2;
+      camera.bottom = size / -2;
 
       camera.updateProjectionMatrix();
 
@@ -81,7 +82,6 @@ const App = () => {
     // synth.oscillator.type = 'sine';
     // gain.toDestination();
     // synth.connect(gain);
-  
 
     //JAMSPACE & HAMMER ----------------------------------------------------------------------
     const jamSpaceGeometry = new THREE.RingGeometry(10, 10, 32);
@@ -139,8 +139,6 @@ const App = () => {
       mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
     }
 
-
-
     let controls = new DragControls(
       [...draggableObjects],
       camera,
@@ -152,14 +150,13 @@ const App = () => {
       drag = true;
       render();
     }
-    let sliderValue = 0.05
-    let slider = document.getElementById("slider");
-    slider.addEventListener('input', onInput) 
+    let sliderValue = 0.05;
+    let slider = document.getElementById('slider');
+    slider.addEventListener('input', onInput);
     function onInput() {
-      sliderValue = Number(slider.value)
+      sliderValue = Number(slider.value);
     }
 
-    
     function addInstrument() {
       if (drag === false) {
         const newInstrument = new Instrument();
@@ -178,8 +175,7 @@ const App = () => {
     window.addEventListener('dblclick', addInstrument, false);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onWindowResize);
-    
-  
+
     //render the scene
     function animate() {
       //requests a render for every frame (60/fps)
@@ -191,7 +187,7 @@ const App = () => {
       const intersects = raycaster.intersectObjects(scene.children);
 
       for (let i = 0; i < intersects.length; i++) {
-       console.log(intersects)
+        console.log(intersects);
       }
 
       //sets the collision trigger for the hammer
@@ -200,7 +196,7 @@ const App = () => {
         .applyMatrix4(hammer.matrixWorld);
       hammerBox.setFromObject(hammer);
 
-      jamSpace.rotation.z += sliderValue
+      jamSpace.rotation.z += sliderValue;
       //NEEDS OPTIMIZING ---
       instruments.forEach((instrument) => {
         //every instrument is rotated
@@ -222,8 +218,7 @@ const App = () => {
           instrument.alreadyPlayed = false;
         }
       });
-      
-     
+
       render();
     }
     function render() {
@@ -231,24 +226,37 @@ const App = () => {
       renderer.render(scene, camera);
     }
     animate();
-  
-   
   }, []);
-  return <div className="App" style={{background: "#38373d", color: 'whitesmoke'}}  >
-    
-  <Slider id="slider" />
-    <button className="about" style={{color: 'whitesmoke', position: 'relative', background: 'transparent', border: 'transparent' }}onClick={()=>setModalOpen(!modalOpen)}>about</button>
-    <Modal className="Modal" isOpen={modalOpen}>    
-      <div className="modalTextDiv">
-        double click these shapes to adjust their sounds<br/>
-        single click to play a sound<br/>
-        jam with your friends or play by yourself <br/>
-        PLACEHOLDERS
-      </div>
-      <button className="closer" onClick={()=>setModalOpen(!modalOpen)}>close</button>
-    </Modal>
+  return (
+    <div className="App" style={{ background: '#38373d', color: 'whitesmoke' }}>
+      <Slider id="slider" />
+      <button
+        className="about"
+        style={{
+          color: 'whitesmoke',
+          position: 'relative',
+          background: 'transparent',
+          border: 'transparent',
+        }}
+        onClick={() => setModalOpen(!modalOpen)}
+      >
+        about
+      </button>
+      <Modal className="Modal" isOpen={modalOpen}>
+        <div className="modalTextDiv">
+          double click these shapes to adjust their sounds
+          <br />
+          single click to play a sound
+          <br />
+          jam with your friends or play by yourself <br />
+          PLACEHOLDERS
+        </div>
+        <button className="closer" onClick={() => setModalOpen(!modalOpen)}>
+          close
+        </button>
+      </Modal>
     </div>
-    
+  );
 };
 
 export default App;
