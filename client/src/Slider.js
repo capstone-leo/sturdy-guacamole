@@ -19,7 +19,7 @@ export function Slider () {
         style={{  right: '40'}}
       ></input> 
       <div className="sliderchild">
-      tempox
+      tempo
       </div>  
        </div>
       
