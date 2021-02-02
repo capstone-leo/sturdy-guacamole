@@ -11,3 +11,25 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.about {
+  background-color: pink;
+  position: absolute;
+  left: 30px;
+  top: 30px;
+
+  }
+
+.about:hover {
+  cursor: grab
+}
+#slider {
+  position: absolute;
+  right:30px;
+  top:30px;
+}
+.slider {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}

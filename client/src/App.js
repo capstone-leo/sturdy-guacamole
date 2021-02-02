@@ -4,6 +4,7 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as Tone from 'tone';
 import Instrument from './Instrument';
 import { Slider } from './Slider'
+import Modal from 'react-modal';
 
 import {
   playC4,
@@ -30,6 +31,7 @@ import {
 import { generateBoxes } from './dryloops.js';
 
 const App = () => {
+  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
@@ -229,7 +231,18 @@ const App = () => {
   
    
   }, []);
-  return <div className="App"><Slider id="slider" /></div>
+  return <div className="App" style={{background: "#38373d", color: 'whitesmoke'}}  >
+  
+    <Slider id="slider" />
+    <button className="about" style={{color: 'whitesmoke', position: 'relative', background: '#38373d', border: 'transparent' }}onClick={()=>setModalOpen(!modalOpen)}>about</button>
+    <Modal isOpen={modalOpen}>
+      <div>
+        double click these shapes to adjust their sounds
+        single click to play a sound
+        jam with your friends or play by yourself 
+        PLACEHOLDERS
+        <button className="about" style={{cursor: 'grab'}} onClick={()=>setModalOpen(!modalOpen)}>close</button></div></Modal>
+    </div>
     
 };
 
