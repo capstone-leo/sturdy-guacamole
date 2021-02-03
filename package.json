@@ -14,7 +14,8 @@
   "dependencies": {
     "concurrently": "^5.3.0",
     "firebase": "^8.2.5",
-    "react-firebase-hooks": "^2.2.0"
+    "react-firebase-hooks": "^2.2.0",
+    "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
     "firebase-tools": "^9.3.0"
