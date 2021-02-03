@@ -6,6 +6,13 @@ import Instrument from './Instrument';
 import { Slider } from './Slider';
 import Modal from 'react-modal';
 
+<<<<<<< HEAD
+=======
+import 'firebase/firestore';
+import 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
+>>>>>>> a3cf7398b8f9543d299abb7817a3503342c2a713
 import {
   playC4,
   playD4,
@@ -29,10 +36,61 @@ import {
   sinG4,
 } from './tone.fn.js';
 import { generateBoxes } from './dryloops.js';
+import { auth, db } from './Home';
+let objectSelect;
 
 const App = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [user] = useAuthState(auth); //user JSON
+  console.log('user-->', user);
+
+  //seed
+  const citiesRef = db.collection('cities');
+  // const sceneRef = db.collection('scenes');
+
+  async function setCities() {
+    return await citiesRef.doc('SF').set({
+      name: 'San Francisco',
+      state: 'CA',
+      country: 'USA',
+      capital: false,
+      population: 860000,
+    });
+  }
+
+  // const sceneRef = db.collection('scenes');
+
+  // async function setScene() {
+  //   return await sceneRef.doc('scene').set({
+  //     scene:
+  //   })
+  // }
+  // console.log(scene)
+  setCities();
+  //get
+  const cityRef = db.collection('cities').doc('SF');
+
+  async function fetchCities() {
+    const doc = await cityRef.get();
+    if (!doc.exists) {
+      console.log('No such document!');
+    } else {
+      console.log('Document data:', doc.data());
+    }
+  }
+  fetchCities();
+
+  // //db Collection reference
+  // const sessionRef = db.collection('Session');
+  // console.log('sessionRef-->', sessionRef);
+
+  // //query
+  // const query = async () => await sessionRef.get();
+  // console.log('query-->', query());
+
+  // const [SessionList] = useCollectionData(query);
+  // console.log('SessionList-->', SessionList);
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
     //Orthographic camera projects 3D space as a 2D image
@@ -108,6 +166,10 @@ const App = () => {
     scene.add(jamSpace);
     jamSpace.add(hammer);
 
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1).normalize();
+    scene.add(light);
+
     //adds each instrument to the scene as a draggable object
     //notice, the instruments mesh is added
     let draggableObjects = [];
@@ -120,10 +182,12 @@ const App = () => {
     //makes objects(instruments) draggable
     const mouse = new THREE.Vector2();
     const raycaster = new THREE.Raycaster();
+
     let drag = false;
     function onMouseMove(event) {
+      event.preventDefault();
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
     let controls = new DragControls(
@@ -131,12 +195,15 @@ const App = () => {
       camera,
       renderer.domElement
     );
-
     controls.addEventListener('drag', onDrag);
     function onDrag() {
       drag = true;
       render();
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3cf7398b8f9543d299abb7817a3503342c2a713
     let sliderValue = 0.05;
     let slider = document.getElementById('slider');
     slider.addEventListener('input', onInput);
@@ -145,18 +212,23 @@ const App = () => {
     }
 
     function addInstrument() {
-      if (drag === false) {
-        const newInstrument = new Instrument();
-        instruments.push(newInstrument);
-        scene.add(newInstrument.mesh);
-        draggableObjects.push(newInstrument.mesh);
-        controls = new DragControls(
-          [...draggableObjects],
-          camera,
-          renderer.domElement
-        );
+      const newInstrument = new Instrument();
+      instruments.push(newInstrument);
+      scene.add(newInstrument.mesh);
+      draggableObjects.push(newInstrument.mesh);
+      controls = new DragControls(
+        [...draggableObjects],
+        camera,
+        renderer.domElement
+      );
+    }
+
+    function playSound() {
+      if (objectSelect) {
+        if (objectSelect.hover) {
+          objectSelect.sound();
+        }
       }
-      drag = false;
     }
 
     function onWindowResize() {
@@ -173,22 +245,55 @@ const App = () => {
     }
 
     window.addEventListener('dblclick', addInstrument, false);
+    window.addEventListener('click', playSound, false);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onWindowResize);
+<<<<<<< HEAD
 
     //render the scene
     function animate() {
       //requests a render for every frame (60/fps)
       requestAnimationFrame(animate);
+=======
+>>>>>>> a3cf7398b8f9543d299abb7817a3503342c2a713
 
-      //raycaster set up
-      raycaster.setFromCamera(mouse, camera);
+    const sceneRef = db.collection('scenes');
 
-      const intersects = raycaster.intersectObjects(scene.children);
+    async function setScene() {
+      return await sceneRef.doc('scenes').set({
+        scene: scene.toJSON(),
+      });
+    }
 
+<<<<<<< HEAD
       for (let i = 0; i < intersects.length; i++) {
         console.log(intersects);
+=======
+    async function fetchScene() {
+      const doc = await sceneRef.doc('scene').get();
+      if (!doc.exists) {
+        console.log('No such document!');
+      } else {
+        console.log('Document data:', doc.data());
+>>>>>>> a3cf7398b8f9543d299abb7817a3503342c2a713
       }
+    }
+    // fetchScene();
+
+    //  async function setCities() {
+    //   return await citiesRef.doc('SF').set({
+    //     name: 'San Francisco',
+    //     state: 'CA',
+    //     country: 'USA',
+    //     capital: false,
+    //     population: 860000,
+    //   });
+    // }
+
+    //render the scene
+    function animate() {
+      //requests a render for every frame (60/fps)
+      requestAnimationFrame(animate);
 
       //sets the collision trigger for the hammer
       hammerBox
@@ -219,9 +324,33 @@ const App = () => {
         }
       });
 
+<<<<<<< HEAD
+=======
+      setScene();
+>>>>>>> a3cf7398b8f9543d299abb7817a3503342c2a713
       render();
+      fetchScene();
     }
     function render() {
+      //raycaster set up
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(draggableObjects);
+      if (intersects.length > 0) {
+        if (objectSelect !== intersects[0].object) {
+          if (objectSelect)
+            objectSelect.material.emissive.setHex(objectSelect.currentHex);
+
+          objectSelect = intersects[0].object;
+          objectSelect.hover = true;
+          objectSelect.currentHex = objectSelect.material.emissive.getHex();
+          objectSelect.material.emissive.setHex(0xff0000);
+        }
+      } else {
+        if (objectSelect)
+          objectSelect.material.emissive.setHex(objectSelect.currentHex);
+
+        objectSelect = null;
+      }
       //RENDER
       renderer.render(scene, camera);
     }
