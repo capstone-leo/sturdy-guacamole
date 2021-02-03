@@ -6,6 +6,10 @@ import Instrument from './Instrument';
 import { Slider } from './Slider';
 import Modal from 'react-modal';
 
+import 'firebase/firestore';
+import 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
 import {
   playC4,
   playD4,
@@ -29,12 +33,61 @@ import {
   sinG4,
 } from './tone.fn.js';
 import { generateBoxes } from './dryloops.js';
-
+import { auth, db } from './Home';
 let objectSelect;
 
 const App = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [user] = useAuthState(auth); //user JSON
+  console.log('user-->', user);
+
+  //seed
+  const citiesRef = db.collection('cities');
+  // const sceneRef = db.collection('scenes');
+
+  async function setCities() {
+    return await citiesRef.doc('SF').set({
+      name: 'San Francisco',
+      state: 'CA',
+      country: 'USA',
+      capital: false,
+      population: 860000,
+    });
+  }
+
+  // const sceneRef = db.collection('scenes');
+
+  // async function setScene() {
+  //   return await sceneRef.doc('scene').set({
+  //     scene:
+  //   })
+  // }
+  // console.log(scene)
+  setCities();
+  //get
+  const cityRef = db.collection('cities').doc('SF');
+
+  async function fetchCities() {
+    const doc = await cityRef.get();
+    if (!doc.exists) {
+      console.log('No such document!');
+    } else {
+      console.log('Document data:', doc.data());
+    }
+  }
+  fetchCities();
+
+  // //db Collection reference
+  // const sessionRef = db.collection('Session');
+  // console.log('sessionRef-->', sessionRef);
+
+  // //query
+  // const query = async () => await sessionRef.get();
+  // console.log('query-->', query());
+
+  // const [SessionList] = useCollectionData(query);
+  // console.log('SessionList-->', SessionList);
   useEffect(() => {
     //instantiate a CAMERA and a RENDERER
     //Orthographic camera projects 3D space as a 2D image
@@ -188,6 +241,34 @@ const App = () => {
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onWindowResize);
 
+    const sceneRef = db.collection('scenes');
+
+    async function setScene() {
+      return await sceneRef.doc('scenes').set({
+        scene: scene.toJSON(),
+      });
+    }
+
+    async function fetchScene() {
+      const doc = await sceneRef.doc('scene').get();
+      if (!doc.exists) {
+        console.log('No such document!');
+      } else {
+        console.log('Document data:', doc.data());
+      }
+    }
+    // fetchScene();
+
+    //  async function setCities() {
+    //   return await citiesRef.doc('SF').set({
+    //     name: 'San Francisco',
+    //     state: 'CA',
+    //     country: 'USA',
+    //     capital: false,
+    //     population: 860000,
+    //   });
+    // }
+
     //render the scene
     function animate() {
       //requests a render for every frame (60/fps)
@@ -222,7 +303,9 @@ const App = () => {
         }
       });
 
+      setScene();
       render();
+      fetchScene();
     }
     function render() {
       //raycaster set up
