@@ -6,11 +6,9 @@ import Instrument from './Instrument';
 import { Slider } from './Slider';
 import Modal from 'react-modal';
 
-import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import {
 	playC4,
@@ -36,27 +34,14 @@ import {
 } from './tone.fn.js';
 import { generateBoxes } from './dryloops.js';
 
-// Initialize Firebase
-firebase.initializeApp({
-	apiKey: 'AIzaSyCL4dmyWs2djZQWA7SkJQM06ket2Z0VzJw',
-	authDomain: 'music-visual-jam-sesh.firebaseapp.com',
-	databaseURL: 'https://music-visual-jam-sesh-default-rtdb.firebaseio.com',
-	projectId: 'music-visual-jam-sesh',
-	storageBucket: 'music-visual-jam-sesh.appspot.com',
-	messagingSenderId: '56740385434',
-	appId: '1:56740385434:web:1f60538266d67451dc4523',
-	measurementId: 'G-QGC5XHSDST'
-});
-// Initialize auth and firestore
-const auth = firebase.auth();
-export const db = firebase.firestore();
+import { auth, db } from './Home';
 
 //Main Component
 const App = () => {
 	const [modalOpen, setModalOpen] = useState(false);
 
-	// const [user] = useAuthState(auth); //user JSON
-	// console.log('user-->', user);
+	const [user] = useAuthState(auth); //user JSON
+	console.log('user-->', user);
 
 	//seed
 	const citiesRef = db.collection('cities');
@@ -323,8 +308,6 @@ const App = () => {
 	}, []);
 	return (
 		<div className='App' style={{ background: '#38373d', color: 'whitesmoke' }}>
-			<SignIn />
-			<SignOut />
 			<Slider id='slider' />
 			<button
 				className='about'
@@ -355,18 +338,4 @@ const App = () => {
 	);
 };
 
-// Helper Components
-function SignIn() {
-	const signInWithGoogle = () => {
-		const provider = new firebase.auth.GoogleAuthProvider();
-		//instatiate new auth token
-		auth.signInWithPopup(provider);
-		//prompts separate window to google login
-	};
-
-	return <button onClick={signInWithGoogle}>Sign in with Google</button>; // button to prompt Google login
-}
-function SignOut() {
-	return auth.currentUser && <button onClick={() => auth.signOut()}>Sign Out</button>;
-}
 export default App;
